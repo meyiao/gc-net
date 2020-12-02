@@ -7,7 +7,7 @@ import numpy as np
 import torchvision.transforms as transforms
 import png
 from PIL import Image
-import torchsnooper
+
 class KITTI2015(Dataset):
 
     def __init__(self, directory, mode, validate_size=40, occ=True, transform=None):
