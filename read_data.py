@@ -2,7 +2,13 @@ from torch.utils.data import Dataset
 import torch
 import torch.nn.functional as F
 from os.path import join
+import os
+
+import sys
+if os.path.exists('/opt/ros/kinetic/lib/python2.7/dist-packages'):
+    sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
 import cv2
+
 import numpy as np
 import torchvision.transforms as transforms
 import png

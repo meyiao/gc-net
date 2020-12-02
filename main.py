@@ -13,6 +13,10 @@ import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
+# set dataset & output path at first
+dataset_dir = '/home/d/Downloads/data_scene_flow'
+output_dir = './output'
+
 h=256
 w=512
 maxdisp=96 #gc_net.py also need to change  must be a multiple of 32...maybe can cancel the outpadding of deconv
@@ -23,18 +27,18 @@ mean = [0.406, 0.456, 0.485]
 std = [0.225, 0.224, 0.229]
 device_ids = [0]
 
-writer = tX.SummaryWriter(log_dir='log', comment='GCNet')
+writer = tX.SummaryWriter(log_dir=os.path.join(output_dir, 'log'), comment='GCNet')
 device = torch.device('cuda')
 print(device)
 
 #train
 def main():
     train_transform = T.Compose([RandomCrop([h,w]), Normalize(mean, std), ToTensor()])
-    train_dataset = KITTI2015('H:/lc\scene_flow', mode='train', transform=train_transform)
+    train_dataset = KITTI2015(dataset_dir, mode='train', transform=train_transform)
     train_loader = DataLoader(train_dataset, batch_size=1, shuffle=True, num_workers=1)
 
     validate_transform = T.Compose([Normalize(mean, std), ToTensor(),Pad(384,1248)])
-    validate_dataset = KITTI2015('H:/lc\scene_flow', mode='validate', transform=validate_transform)
+    validate_dataset = KITTI2015(dataset_dir, mode='validate', transform=validate_transform)
     validate_loader = DataLoader(validate_dataset, batch_size=1, num_workers=1)
 
     step = 0
@@ -152,7 +156,11 @@ def adjust_lr(optimizer, epoch):
             param_group['lr'] = lr
 
 def save(model, optimizer, epoch, step, error, best_error):
-    path = os.path.join('model', '{:03}.ckpt'.format(epoch))
+    model_dir = os.path.join(output_dir, 'model')
+    if not os.path.exists(model_dir):
+        os.makedirs(model_dir)
+
+    path = os.path.join(model_dir, '{:03}.ckpt'.format(epoch))
     # torch.save(model.state_dict(), path)
     # model.save_state_dict(path)
 
@@ -168,7 +176,7 @@ def save(model, optimizer, epoch, step, error, best_error):
 
     if error < best_error:
         best_error = error
-        best_path = os.path.join('model', 'best_model.ckpt'.format(epoch))
+        best_path = os.path.join(model_dir, 'best_model.ckpt'.format(epoch))
         shutil.copyfile(path, best_path)
         print('best model in epoch {}'.format(epoch))
 
