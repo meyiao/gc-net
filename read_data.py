@@ -135,13 +135,13 @@ class ToTensor():
     def __call__(self, sample):
         left = sample['left']
         right = sample['right']
-        disp = sample['disp']
+        if 'disp' in sample.keys():
+            disp = sample['disp']
         # H x W x C ---> C x H x W
         sample['left'] = torch.from_numpy(left.transpose([2, 0, 1])).type(torch.FloatTensor)
         sample['right'] = torch.from_numpy(right.transpose([2, 0, 1])).type(torch.FloatTensor)
-        sample['disp'] = torch.from_numpy(disp).type(torch.FloatTensor)
-        # if 'disp' in sample:
-        #     sample['disp'] = torch.from_numpy(sample['disp']).type(torch.FloatTensor)
+        if 'disp' in sample.keys():
+            sample['disp'] = torch.from_numpy(disp).type(torch.FloatTensor)
 
         return sample
 
@@ -159,12 +159,16 @@ class Pad():
         left = F.pad(left, pad=(0, pad_w, 0, pad_h))
         right = sample['right'].unsqueeze(0)  # [1, 3, H, W]
         right = F.pad(right, pad=(0, pad_w, 0, pad_h))
-        disp = sample['disp'].unsqueeze(0).unsqueeze(1)  # [1, 1, H, W]
-        disp = F.pad(disp, pad=(0, pad_w, 0, pad_h))
+
+        if 'disp' in sample.keys():
+            disp = sample['disp'].unsqueeze(0).unsqueeze(1)  # [1, 1, H, W]
+            disp = F.pad(disp, pad=(0, pad_w, 0, pad_h))
 
         sample['left'] = left.squeeze()
         sample['right'] = right.squeeze()
-        sample['disp'] = disp.squeeze()
+
+        if 'disp' in sample.keys():
+            sample['disp'] = disp.squeeze()
 
         return sample
 

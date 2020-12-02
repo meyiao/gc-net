@@ -14,7 +14,7 @@ import cv2
 max_disp = 192
 left_path = 'test/left/000000_10.png'
 right_path = 'test/right/000000_10.png'
-model_path = 'test/model/198.ckpt'
+model_path = 'test/model/best_model.ckpt'
 save_path = 'test/pic'
 
 mean = [0.406, 0.456, 0.485]
@@ -24,6 +24,12 @@ device = torch.device('cuda:{}'.format(device_ids[0]))
 h=256
 w=512
 maxdisp=160
+
+
+if hasattr(torch.cuda, 'empty_cache'):
+    print('empty cache')
+    torch.cuda.empty_cache()
+
 
 def main():
     left = cv2.imread(left_path)
